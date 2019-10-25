@@ -2,6 +2,7 @@ package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.base.AjaxResult;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.page.TableDataInfo;
 import com.ruoyi.common.utils.ExcelUtil;
@@ -14,7 +15,7 @@ import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.ObjectUtils;
+import cn.hutool.core.util.ObjectUtil;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -115,8 +116,11 @@ public class SysUserController extends BaseController {
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
     public AjaxResult addSave(SysUser user) {
-        if (ObjectUtils.allNotNull(user.getUserId()) && SysUser.isAdmin(user.getUserId())) {
+        if (ObjectUtil.isNotNull(user.getUserId()) && SysUser.isAdmin(user.getUserId())) {
             return error("不允许修改超级管理员用户");
+        }
+        if (UserConstants.USER_NAME_NOT_UNIQUE.equals(userService.checkLoginNameUnique(user.getLoginName()))){
+            return error("保存用户'" + user.getLoginName() + "'失败，账号已存在");
         }
         user.setSalt(ShiroUtils.randomSalt());
         user.setPassword(passwordService.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
@@ -143,7 +147,7 @@ public class SysUserController extends BaseController {
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
     public AjaxResult editSave(SysUser user) {
-        if (ObjectUtils.allNotNull(user.getUserId()) && SysUser.isAdmin(user.getUserId())) {
+        if (ObjectUtil.isNotNull(user.getUserId()) && SysUser.isAdmin(user.getUserId())) {
             return error("不允许修改超级管理员用户");
         }
         user.setUpdateBy(ShiroUtils.getLoginName());

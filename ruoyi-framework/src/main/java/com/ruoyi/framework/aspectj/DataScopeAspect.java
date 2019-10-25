@@ -1,5 +1,6 @@
 package com.ruoyi.framework.aspectj;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.base.BaseEntity;
@@ -13,7 +14,6 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
 import java.lang.reflect.Method;
 
@@ -71,7 +71,7 @@ public class DataScopeAspect {
         }
         // 获取当前的用户
         SysUser currentUser = ShiroUtils.getSysUser();
-        if (!ObjectUtils.isEmpty(currentUser) && !currentUser.isAdmin()) {
+        if (ObjectUtil.isNotNull(currentUser) && !currentUser.isAdmin()) {
             // 如果是超级管理员，则不过滤数据
             dataScopeFilter(joinPoint, currentUser, controllerDataScope.tableAlias());
         }
@@ -95,7 +95,10 @@ public class DataScopeAspect {
             }else if (DATA_SCOPE_DEPT.equals(dataScope)){
                 sqlString.append(String.format(" OR %s.dept_id = %d ", alias, user.getDeptId()));
             }else if (DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope)){
-                sqlString.append(String.format(" OR %s.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = %d or parent_id = %d )", alias, user.getDeptId(), user.getDeptId()));
+                String deptChild = user.getDept().getParentId() + "," + user.getDeptId();
+                sqlString.append(String.format(
+                        " OR  %s.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id =  %d or ancestors LIKE '%%%s%%' )",
+                        alias, user.getDeptId(), deptChild));
             }
         }
 

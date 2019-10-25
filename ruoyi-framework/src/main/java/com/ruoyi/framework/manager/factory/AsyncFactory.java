@@ -49,7 +49,7 @@ public class AsyncFactory {
                 online.setLastAccessTime(session.getLastAccessTime());
                 online.setExpireTime(session.getTimeout());
                 online.setIpaddr(session.getHost());
-                online.setLoginLocation(AddressUtils.getRealAddressByIP(session.getHost()));
+                online.setLoginLocation(AddressUtils.getRealAddressByIp(session.getHost()));
                 online.setBrowser(session.getBrowser());
                 online.setOs(session.getOs());
                 online.setStatus(session.getStatus());
@@ -70,7 +70,7 @@ public class AsyncFactory {
             @Override
             public void run() {
                 // 远程查询操作地点
-                operLog.setOperLocation(AddressUtils.getRealAddressByIP(operLog.getOperIp()));
+                operLog.setOperLocation(AddressUtils.getRealAddressByIp(operLog.getOperIp()));
                 SpringUtils.getBean(ISysOperLogService.class).insertOperlog(operLog);
             }
         };
@@ -92,8 +92,9 @@ public class AsyncFactory {
             @Override
             public void run() {
                 // 打印信息到日志
+                String address = AddressUtils.getRealAddressByIp(ip);
                 String s = LogUtils.getBlock(ip) +
-                        AddressUtils.getRealAddressByIP(ip) +
+                        address +
                         LogUtils.getBlock(username) +
                         LogUtils.getBlock(status) +
                         LogUtils.getBlock(message);
@@ -106,7 +107,7 @@ public class AsyncFactory {
                 SysLogininfor logininfor = new SysLogininfor();
                 logininfor.setLoginName(username);
                 logininfor.setIpaddr(ip);
-                logininfor.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
+                logininfor.setLoginLocation(address);
                 logininfor.setBrowser(browser);
                 logininfor.setOs(os);
                 logininfor.setMsg(message);

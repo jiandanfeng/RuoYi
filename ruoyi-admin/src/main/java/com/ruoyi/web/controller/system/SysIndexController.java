@@ -42,6 +42,7 @@ public class SysIndexController extends BaseController {
         mmap.put("menus", menus);
         mmap.put("user", sysUser);
         mmap.put("copyrightYear", Global.getCopyrightYear());
+        mmap.put("demoEnabled", Global.isDemoEnabled());
         return "index";
     }
 
@@ -56,5 +57,17 @@ public class SysIndexController extends BaseController {
     public String main(ModelMap mmap) {
         mmap.put("version", Global.getVersion());
         return "main";
+    }
+
+    /**
+     * 统计模版首页
+     *
+     * @param mmap ModelMap
+     * @return
+     */
+    @GetMapping("/system/mainV1")
+    public String mainV1(ModelMap mmap) {
+        mmap.put("version", Global.getVersion());
+        return "main_v1";
     }
 }
