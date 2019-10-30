@@ -27,6 +27,7 @@ public class RuoYiApplication {
         System.out.println("启动完成.....");
         log.info(":: 若依管理系统Java开发平台  :: 基于 Spring Boot {} ::", SpringBootVersion.getVersion());
         log.info(":: 启动成功!耗时:{}秒 ::", Duration.between(inst1, Instant.now()).getSeconds());
+        System.out.println("启动完成log结束.....dev");
     }
 
 }
